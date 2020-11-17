@@ -26,11 +26,6 @@ def cnn_model(input_shape,decay):
     input1_x = Activation('relu')(input1_x)
     input1_x = Dropout(0.25)(input1_x)
 
-    # input1_x_1 = GlobalAveragePooling2D()(input1_x)
-    # input1_x_1 = Dense(units=2,activation='relu',use_bias=False,kernel_regularizer=l2(l=decay))(input1_x_1)
-    # input1_x_1 = Dense(units=16, activation='sigmoid', use_bias=False,kernel_regularizer=l2(l=decay))(input1_x_1)
-    # input1_x = Multiply()([input1_x,input1_x_1])
-
     input1_x = Conv2D(filters=16, kernel_size = (8,1),use_bias=False,padding='valid',kernel_regularizer=l2(l=decay),kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.01, seed=None))(input1_x)
     input1_x = BatchNormalization()(input1_x)
     input1_x = Activation('relu')(input1_x)
@@ -51,11 +46,6 @@ def cnn_model(input_shape,decay):
     input2_x = Activation('relu')(input2_x)
     input2_x = Dropout(0.25)(input2_x)
 
-    # input2_x_1 = GlobalAveragePooling2D()(input2_x)
-    # input2_x_1 = Dense(units=2,activation='relu',use_bias=False,kernel_regularizer=l2(l=decay))(input2_x_1)
-    # input2_x_1 = Dense(units=16, activation='sigmoid', use_bias=False,kernel_regularizer=l2(l=decay))(input2_x_1)
-    # input2_x = Multiply()([input2_x,input2_x_1])
-
     input2_x = Conv2D(filters=16, kernel_size = (8,1),use_bias=False,padding='valid',kernel_regularizer=l2(l=decay),kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.01, seed=None))(input2_x)
     input2_x = BatchNormalization()(input2_x)
     input2_x = Activation('relu')(input2_x)
@@ -75,11 +65,6 @@ def cnn_model(input_shape,decay):
     input3_x = BatchNormalization()(input3_x)
     input3_x = Activation('relu')(input3_x)
     input3_x = Dropout(0.25)(input3_x)
-
-    # input3_x_1 = GlobalAveragePooling2D()(input3_x)
-    # input3_x_1 = Dense(units=2,activation='relu',use_bias=False,kernel_regularizer=l2(l=decay))(input3_x_1)
-    # input3_x_1 = Dense(units=16, activation='sigmoid', use_bias=False,kernel_regularizer=l2(l=decay))(input3_x_1)
-    # input3_x = Multiply()([input3_x,input3_x_1])
 
     input3_x = Conv2D(filters=16, kernel_size = (8,1),use_bias=False,padding='valid',kernel_regularizer=l2(l=decay),kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.01, seed=None))(input3_x)
     input3_x = BatchNormalization()(input3_x)
@@ -124,8 +109,6 @@ if __name__ == "__main__":
     all_trailers = ['s1', 's2', 's3', 's4', 's5',
                     's6', 's7', 's8', 's9', 's10']
 
-    # all_trailers = ['s1']
-
     acc_avg_total = [0]*10
     num_folds = 10
 
@@ -147,13 +130,11 @@ if __name__ == "__main__":
             label_tr, label_ts = train_labels_one_hot[train_index], train_labels_one_hot[test_index]
             
             EEG_model = cnn_model((10,402,1),decay = 0.001) #complex: 11,402,1 or abs: 11,201,1
-            # EEG_model.summary()
             
             sgd = optimizers.SGD(lr=0.001, decay=0, momentum=0.9, nesterov=False)
             EEG_model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
             EEG_model.fit([x_tr1,x_tr2,x_tr3], label_tr, epochs=epoch, batch_size=batch_size, verbose=0)
-            # EEG_model.fit([x_tr1,x_tr2,x_tr3], label_tr, epochs=epoch, batch_size=batch_size, verbose=1,validation_data=([x_ts1,x_ts2,x_ts3],label_ts))
 
             test_loss, test_acc = EEG_model.evaluate([x_ts1,x_ts2,x_ts3], label_ts,verbose=0)
             print("%s第%d次准确率: %.4f，共测试了%d组数据 " % (all_trailers[i],(per_index+1),test_acc, len(label_ts)))
